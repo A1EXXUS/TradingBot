@@ -1,0 +1,20 @@
+{
+  "mcpServers": {
+    "bybit": {
+      "command": "npx",
+      "args": ["bybit-mcp-server"],
+      "env": {
+        "BYBIT_API_KEY": "YOUR_BYBIT_API_KEY",
+        "BYBIT_API_SECRET": "YOUR_BYBIT_API_SECRET",
+        "BYBIT_ENVIRONMENT": "mainnet"
+      }
+    },
+    "coinmarketcap": {
+      "command": "npx",
+      "args": ["-y", "@shinzolabs/coinmarketcap-mcp"],
+      "env": {
+        "COINMARKETCAP_API_KEY": "YOUR_COINMARKETCAP_API_KEY"
+      }
+    }
+  }
+}
