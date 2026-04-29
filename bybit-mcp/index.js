@@ -8,6 +8,7 @@ const client = new RestClientV5({
   secret: process.env.BYBIT_API_SECRET,
   testnet: process.env.BYBIT_TESTNET === "true",
 });
+const isDryRun = process.env.BYBIT_DRY_RUN === "true";
 
 const server = new Server(
   { name: "bybit-mcp", version: "1.0.0" },
@@ -214,26 +215,67 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         if (args.takeProfit) orderParams.takeProfit = args.takeProfit;
         if (args.stopLoss) orderParams.stopLoss = args.stopLoss;
         if (args.positionIdx !== undefined) orderParams.positionIdx = args.positionIdx;
-        result = await client.submitOrder(orderParams);
+        if (isDryRun) {
+          result = {
+            dryRun: true,
+            action: "place_order",
+            message: "Order was simulated and not sent to Bybit.",
+            orderParams,
+          };
+        } else {
+          result = await client.submitOrder(orderParams);
+        }
         break;
       }
       case "cancel_order": {
         const cancelParams = { category: args.category, symbol: args.symbol };
         if (args.orderId) cancelParams.orderId = args.orderId;
         if (args.orderLinkId) cancelParams.orderLinkId = args.orderLinkId;
-        result = await client.cancelOrder(cancelParams);
+        if (isDryRun) {
+          result = {
+            dryRun: true,
+            action: "cancel_order",
+            message: "Cancel was simulated and not sent to Bybit.",
+            cancelParams,
+          };
+        } else {
+          result = await client.cancelOrder(cancelParams);
+        }
         break;
       }
       case "cancel_all_orders":
-        result = await client.cancelAllOrders({ category: args.category, symbol: args.symbol });
+        if (isDryRun) {
+          result = {
+            dryRun: true,
+            action: "cancel_all_orders",
+            message: "Cancel-all was simulated and not sent to Bybit.",
+            params: { category: args.category, symbol: args.symbol },
+          };
+        } else {
+          result = await client.cancelAllOrders({ category: args.category, symbol: args.symbol });
+        }
         break;
       case "set_leverage":
-        result = await client.setLeverage({
-          category: args.category,
-          symbol: args.symbol,
-          buyLeverage: args.buyLeverage,
-          sellLeverage: args.sellLeverage,
-        });
+        if (isDryRun) {
+          result = {
+            dryRun: true,
+            action: "set_leverage",
+            message: "Leverage change was simulated and not sent to Bybit.",
+            params: {
+              category: args.category,
+              symbol: args.symbol,
+              buyLeverage: args.buyLeverage,
+              sellLeverage: args.sellLeverage,
+            },
+          };
+        } else {
+          result = await client.setLeverage({
+            category: args.category,
+            symbol: args.symbol,
+            buyLeverage: args.buyLeverage,
+            sellLeverage: args.sellLeverage,
+          });
+        }
         break;
       case "get_instruments_info":
         result = await client.getInstrumentsInfo({ category: args.category, symbol: args.symbol });

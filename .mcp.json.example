@@ -1,12 +1,13 @@
 {
   "mcpServers": {
     "bybit": {
-      "command": "npx",
-      "args": ["bybit-mcp-server"],
+      "command": "node",
+      "args": ["bybit-mcp/index.js"],
       "env": {
         "BYBIT_API_KEY": "YOUR_BYBIT_API_KEY",
         "BYBIT_API_SECRET": "YOUR_BYBIT_API_SECRET",
-        "BYBIT_ENVIRONMENT": "mainnet"
+        "BYBIT_TESTNET": "false",
+        "BYBIT_DRY_RUN": "true"
       }
     },
     "coinmarketcap": {
